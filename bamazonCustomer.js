@@ -44,6 +44,8 @@ function makePurchse() {
   connection.query("SELECT * FROM products", function (err, res) {
     if (err) throw err;
 
+    console.log('res', res);
+
     inquirer
       .prompt([
 
@@ -83,13 +85,21 @@ function makePurchse() {
       ])
 
       .then( function(answer) {
-         
+        console.log('answer', answer)
+
+        // if there is stock > req, then update
+        if(answer.stock_quantity <= res[i].stock_quantity){
         for (var i = 0; i < res.length; i++){
         connection.query(`UPDATE products SET stock_quantity = '${(res[i].stock_quantity - answer.count)}' WHERE product_name = '${res[i].product_name}'`, ((err, res) => {
-          if (err) throw (err);
           console.log(`Your purchase of ${answer.count} unit(s) of ${res[i].product_name} has been recoded! Your total is $${answer.count * res[i].price}`);
+          // if no amount OR err
+          if (err) {
+            console.log('res[i]', res[i])
+            // console.log(`Your purchase of ${answer.count} unit(s) of ${res[i].product_name} has been recoded! Your total is $${answer.count * res[i].price}`);
+            throw error;
+          }
         }));
-      }
+      
       })
 
   });
